@@ -4,6 +4,9 @@ import com.example.recordatorios_esp32.model.Recordatorio;
 import com.example.recordatorios_esp32.repository.RecordatorioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -15,7 +18,9 @@ public class RecordatorioController {
 
     @GetMapping("/pendientes")
     public List<Recordatorio> pendientes() {
-        return repo.findByActivoTrueAndMostradoFalse();
+        LocalDate hoy = LocalDate.now();
+        LocalTime horaActual = LocalTime.now();
+        return repo.findVencidos(hoy, horaActual);
     }
 
     @PostMapping
@@ -27,6 +32,7 @@ public class RecordatorioController {
     public Recordatorio completar(@PathVariable Long id) {
         Recordatorio r = repo.findById(id).orElseThrow();
         r.setMostrado(true);
+        r.setActivo(false);
         return repo.save(r);
     }
 }
