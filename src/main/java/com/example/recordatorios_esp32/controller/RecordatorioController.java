@@ -38,4 +38,9 @@ public class RecordatorioController {
         r.setActivo(false);
         return repo.save(r);
     }
+    @GetMapping("/hoy")
+    public List<Recordatorio> deHoy() {
+        LocalDate hoy = LocalDate.now(ZONA_COLOMBIA);
+        return repo.findDeHoy(hoy);
+    }
 }

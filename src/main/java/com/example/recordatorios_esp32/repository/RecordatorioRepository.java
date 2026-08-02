@@ -16,4 +16,6 @@ public interface RecordatorioRepository extends JpaRepository<Recordatorio, Long
     @Query("SELECT r FROM Recordatorio r WHERE r.activo = true AND r.mostrado = false " +
             "AND (r.fecha < :hoy OR (r.fecha = :hoy AND r.hora <= :horaActual))")
     List<Recordatorio> findVencidos(@Param("hoy") LocalDate hoy, @Param("horaActual") LocalTime horaActual);
+    @Query("SELECT r FROM Recordatorio r WHERE r.activo = true AND r.fecha = :hoy ORDER BY r.hora ASC")
+    List<Recordatorio> findDeHoy(@Param("hoy") LocalDate hoy);
 }
