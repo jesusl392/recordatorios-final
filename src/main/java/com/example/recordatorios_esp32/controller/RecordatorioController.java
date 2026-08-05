@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -38,9 +39,32 @@ public class RecordatorioController {
         r.setActivo(false);
         return repo.save(r);
     }
+
     @GetMapping("/hoy")
     public List<Recordatorio> deHoy() {
         LocalDate hoy = LocalDate.now(ZONA_COLOMBIA);
         return repo.findDeHoy(hoy);
+    }
+
+    @PutMapping("/{id}/posponer")
+    public Recordatorio posponer(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int minutos,
+            @RequestParam(defaultValue = "0") int dias
+    ) {
+        Recordatorio r = repo.findById(id).orElseThrow();
+
+        // Calculamos el nuevo momento a partir de AHORA (no de la hora original),
+        // sumándole los minutos/días que el usuario eligió en el ESP32
+        LocalDateTime nuevoMomento = LocalDateTime.now(ZONA_COLOMBIA)
+                .plusMinutes(minutos)
+                .plusDays(dias);
+
+        r.setFecha(nuevoMomento.toLocalDate());
+        r.setHora(nuevoMomento.toLocalTime());
+        r.setMostrado(false); // para que vuelva a aparecer cuando llegue esa nueva hora
+        r.setActivo(true);    // se queda activo, solo se movió la fecha/hora
+
+        return repo.save(r);
     }
 }
