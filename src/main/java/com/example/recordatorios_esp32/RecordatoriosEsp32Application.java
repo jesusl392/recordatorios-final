@@ -2,6 +2,9 @@ package com.example.recordatorios_esp32;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@EnableScheduling
 
 @SpringBootApplication
 public class RecordatoriosEsp32Application {

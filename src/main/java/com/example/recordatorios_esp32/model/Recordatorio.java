@@ -9,13 +9,14 @@ public class Recordatorio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String titulo;
     private LocalDate fecha;
     private LocalTime hora;
     private boolean activo = true;
     private boolean mostrado = false;
+    private boolean notificadoPush = false;
 
+    // Getters y setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitulo() { return titulo; }
@@ -28,4 +29,6 @@ public class Recordatorio {
     public void setActivo(boolean activo) { this.activo = activo; }
     public boolean isMostrado() { return mostrado; }
     public void setMostrado(boolean mostrado) { this.mostrado = mostrado; }
+    public boolean isNotificadoPush() { return notificadoPush; }
+    public void setNotificadoPush(boolean notificadoPush) { this.notificadoPush = notificadoPush; }
 }
