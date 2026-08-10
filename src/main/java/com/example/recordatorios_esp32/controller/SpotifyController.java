@@ -84,7 +84,7 @@ public class SpotifyController {
         return (String) respuesta.get("access_token");
     }
 
-    @GetMapping("/actual")
+    @GetMapping(value = "/actual", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> actual() {
         String accessToken = obtenerAccessToken();
         if (accessToken == null) {
