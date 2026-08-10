@@ -88,6 +88,7 @@ public class SpotifyController {
     public Map<String, Object> actual() {
         String accessToken = obtenerAccessToken();
         if (accessToken == null) {
+            System.out.println("Spotify: no hay token guardado");
             return Map.of("reproduciendo", false);
         }
 
@@ -102,6 +103,7 @@ public class SpotifyController {
                     HttpMethod.GET, request, Map.class);
 
             if (respuesta.getStatusCode() == HttpStatus.NO_CONTENT || respuesta.getBody() == null) {
+                System.out.println("Spotify: respuesta vacia o sin contenido, status: " + respuesta.getStatusCode());
                 return Map.of("reproduciendo", false);
             }
 
@@ -117,6 +119,8 @@ public class SpotifyController {
                     "artista", artista
             );
         } catch (Exception e) {
+            System.out.println("Spotify ERROR: " + e.getMessage());
+            e.printStackTrace();
             return Map.of("reproduciendo", false);
         }
     }
