@@ -88,7 +88,6 @@ public class SpotifyController {
     public Map<String, Object> actual() {
         String accessToken = obtenerAccessToken();
         if (accessToken == null) {
-            System.out.println("Spotify: no hay token guardado");
             return Map.of("reproduciendo", false);
         }
 
@@ -103,7 +102,6 @@ public class SpotifyController {
                     HttpMethod.GET, request, Map.class);
 
             if (respuesta.getStatusCode() == HttpStatus.NO_CONTENT || respuesta.getBody() == null) {
-                System.out.println("Spotify: respuesta vacia o sin contenido, status: " + respuesta.getStatusCode());
                 return Map.of("reproduciendo", false);
             }
 
@@ -113,14 +111,37 @@ public class SpotifyController {
             String artista = (String) artistas.get(0).get("name");
             boolean reproduciendo = (Boolean) respuesta.getBody().get("is_playing");
 
-            return Map.of(
-                    "reproduciendo", reproduciendo,
-                    "cancion", nombreCancion,
-                    "artista", artista
-            );
+            // --- Consultamos la cola para saber qué sigue ---
+            String siguienteCancion = "";
+            String siguienteArtista = "";
+
+            try {
+                ResponseEntity<Map> respuestaCola = rest.exchange(
+                        "https://api.spotify.com/v1/me/player/queue",
+                        HttpMethod.GET, request, Map.class);
+
+                List<Map<String, Object>> cola = (List<Map<String, Object>>) respuestaCola.getBody().get("queue");
+
+                if (cola != null && !cola.isEmpty()) {
+                    Map<String, Object> siguienteItem = cola.get(0);
+                    siguienteCancion = (String) siguienteItem.get("name");
+                    List<Map<String, Object>> artistasSiguiente = (List<Map<String, Object>>) siguienteItem.get("artists");
+                    siguienteArtista = (String) artistasSiguiente.get(0).get("name");
+                }
+            } catch (Exception e) {
+                System.out.println("No se pudo obtener la cola: " + e.getMessage());
+            }
+
+            Map<String, Object> resultado = new java.util.HashMap<>();
+            resultado.put("reproduciendo", reproduciendo);
+            resultado.put("cancion", nombreCancion);
+            resultado.put("artista", artista);
+            resultado.put("siguiente", siguienteCancion);
+            resultado.put("siguienteArtista", siguienteArtista);
+
+            return resultado;
         } catch (Exception e) {
             System.out.println("Spotify ERROR: " + e.getMessage());
-            e.printStackTrace();
             return Map.of("reproduciendo", false);
         }
     }
